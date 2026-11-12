@@ -101,9 +101,6 @@
 </head>
 <body>
 
-    <!-- Click Sound Audio -->
-    <audio id="clickSound" src="https://assets.mixkit.co/sfx/preview/mixkit-modern-technology-select-3124.mp3"></audio>
-
     <div class="calculator">
         <input type="text" class="display" id="display" readonly>
         <div class="buttons">
@@ -136,30 +133,46 @@
     <script>
         const display = document.getElementById('display');
 
-        // Sound Function
-        function playSound() {
-            let sound = document.getElementById('clickSound');
-            sound.currentTime = 0; // Restart sound
-            sound.play();
+        // Ye Audio Context API sound generate karega bina kisi internet file ke
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContext();
+
+        function playClickSound() {
+            // Agar phone silent mode mein hai toh sound nahi bajegi
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            oscillator.type = 'square'; // 'tak tak' jaisi sound ke liye
+            oscillator.frequency.setValueAtTime(600, audioCtx.currentTime); // Frequency tune
+            oscillator.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.1);
+
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.1);
         }
 
         function appendValue(val) {
-            playSound();
+            playClickSound();
             display.value += val;
         }
 
         function clearDisplay() {
-            playSound();
+            playClickSound();
             display.value = '';
         }
 
         function deleteLast() {
-            playSound();
+            playClickSound();
             display.value = display.value.slice(0, -1);
         }
 
         function calculate() {
-            playSound();
+            playClickSound();
             try {
                 display.value = eval(display.value);
             } catch (e) {
@@ -168,4 +181,4 @@
         }
     </script>
 </body>
-  </html>
+                </html>
